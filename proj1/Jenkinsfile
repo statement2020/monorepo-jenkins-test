@@ -1,5 +1,5 @@
 stage('Proj1 Build Stage') {
-  echo 'Proj1 Build Stage')
+  echo 'Proj1 Build Stage'
 }
 
 stage('Proj 1 Test Stage') {
