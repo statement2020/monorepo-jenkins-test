@@ -8,7 +8,7 @@ node {
        script: """git diff HEAD~1 --name-only | cut -f1 -d"/" | sort -u""",
        returnStdout: true)
    echo changedDirs
-   changedDirs.each{dir -> buildMap[dir] = load "${dir}/Jenkinsfile"}
+   changedDirs.split("\n").each{dir -> if(!dir.equals("Jenksinfile") {buildMap[dir] = load "${dir}/Jenkinsfile"}}
   }
   stage('Build') {
     parallel(buildMap)
