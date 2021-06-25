@@ -4,8 +4,9 @@ node {
     checkout scm
   }
   stage ('Detect changed directories') {
+    def lastSuccessfulBuildCommit = getLastSuccessfulCommit()
     def changedDirs = sh(
-       script: """git diff HEAD~1 --name-only | cut -f1 -d"/" | sort -u""",
+       script: """git diff ${lastSuccessfulBuildCommit} --name-only | cut -f1 -d"/" | sort -u""",
        returnStdout: true)
    echo changedDirs
    changedDirs.split("\n").each{dir -> if (!dir.equals("Jenkinsfile")) {buildMap[dir] =  {load "${dir}/Jenkinsfile"}}}
@@ -13,4 +14,10 @@ node {
   stage('Build') {
     parallel(buildMap)
   }
+}
+
+def getLastSuccessfulCommit() {
+   def lastSuccessfulBuild = currentBuild.rawBuild.getPreviousSuccessfulBuild()
+   def lastBuild = lastSuccessfulBuild.actions.find { action -> action instanceof hudson.plugins.git.util.BuildData }.lastBuild
+   return lastBuild?.revision?.getSha1String()
 }
